@@ -75,7 +75,7 @@ export default function UploadImage() {
         formData.append('images', selectedFiles[i]);
       }
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/upload-multipart', {
         method: 'POST',
         body: formData,
       });
