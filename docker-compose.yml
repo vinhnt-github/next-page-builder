@@ -5,6 +5,6 @@ services:
       - BACKEND_URL=http://host.docker.internal:8080  # Example environment variable for API URL
     build:
       context: .
-      dockerfile: tools/fe.Dockerfile
+      dockerfile: tools/Dockerfile
     ports:
       - "3000:3000"
