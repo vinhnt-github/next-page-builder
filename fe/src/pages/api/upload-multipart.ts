@@ -1,8 +1,7 @@
 import { createFormDataMiddleware } from '@/lib/api-middleware/withMultiplePathForm';
-import FormData from 'form-data';
 import formidable from 'formidable';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 interface UploadResponse {
     success: boolean;
     message: string;
@@ -47,13 +46,10 @@ export default async function handler(
     createFormDataMiddleware(processedReq, res, async () => {
         try {
             // Send to Express backend
-            const backendUrl = process.env.BACKEND_URL || 'http://127.0.0.1:8080';
+            const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
             const response = await fetch(`${backendUrl}/api/upload`, {
                 method: 'POST',
-                body: req.body,
-                headers: {
-                    ...processedReq.body.getHeaders(), // Forward FormData headers
-                }
+                body: processedReq.body,
             });
 
             if (!response.ok) {

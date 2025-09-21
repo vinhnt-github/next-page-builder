@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
-import FormData from 'form-data';
+// import FormData from 'form-data';
 import fs from 'fs';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
+import path from 'path';
+
 
 interface ProcessedRequest extends NextApiRequest {
     formData?: FormData;
@@ -73,20 +75,27 @@ export const createFormDataMiddleware = async (
         });
 
         // Add all files to FormData
-        Object.entries(files).forEach(([fieldName, fileArray]) => {
+        for (const [fieldName, fileArray] of Object.entries(files)) {
             const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
-
-            fileList.forEach((file, index) => {
+            for (let index = 0; index < fileList.length; index++) {
+                const file = fileList[index];
                 if (file && file.filepath) {
-                    const fileStream = fs.createReadStream(file.filepath);
-                    formData.append(fieldName, fileStream, {
-                        filename: file.originalFilename || `file-${index}`,
-                        contentType: file.mimetype || 'application/octet-stream'
+                    // const fileStream = fs.createReadStream(file.filepath);
+                    const buffer = fs.readFileSync(file.filepath);
+
+                    // Use the Web API File 
+                    // const fileObject = new File([buffer], file.originalFilename || `file-${index}`, { type: file.mimetype || 'application/octet-stream' });
+                    // formData.append(fieldName, fileObject);
+
+                    // use Blob instead of File if File is not available
+                    const blob = new Blob([buffer], {
+                        type: file.mimetype || 'application/octet-stream'
                     });
+                    formData.append(fieldName, blob, file.originalFilename || `file-${index}`);
                     console.log(`📎 Added file: ${fieldName} = ${file.originalFilename} (${file.mimetype})`);
                 }
-            });
-        });
+            }
+        }
 
         // Attach processed data to request object
         req.body = formData;
@@ -100,7 +109,7 @@ export const createFormDataMiddleware = async (
         cleanupTempFiles('success', req.parsedFiles || []);
 
     } catch (error) {
-        console.error('❌ FormData middleware error:', error);
+        console.error('❌ FormData middleware erroxxxxxxxr:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to process form data',
