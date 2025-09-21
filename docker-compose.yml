@@ -1,0 +1,10 @@
+version: '3'
+services:
+  fe:
+    environment: # Add this line to set environment variables
+      - BACKEND_URL=http://host.docker.internal:8080  # Example environment variable for API URL
+    build:
+      context: .
+      dockerfile: tools/fe.Dockerfile
+    ports:
+      - "3000:3000"
